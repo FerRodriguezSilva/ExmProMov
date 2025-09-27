@@ -1,40 +1,93 @@
 package com.calyrsoft.ucbp1.features.movie.presentation
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
+import androidx.compose.material3.CardDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.calyrsoft.ucbp1.features.movie.domain.model.MovieModel
-import com.calyrsoft.ucbp1.features.movie.domain.usecase.FetchPopularMoviesUseCase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import com.calyrsoft.ucbp1.R
 
-class PopularMoviesViewModel(
-    private val fetchPopularMovies: FetchPopularMoviesUseCase
-): ViewModel() {
-
-    sealed class UiState {
-        object Loading : UiState()
-        data class Success(val movies: List<MovieModel>) : UiState()
-        data class Error(val message: String) : UiState()
-    }
-
-    private val _state = MutableStateFlow<UiState>(UiState.Loading)
-    val state: StateFlow<UiState> = _state.asStateFlow()
-
-    fun fetchPopularMovies() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _state.value = UiState.Loading
-            val result = fetchPopularMovies.invoke()
-            result.fold(
-                onSuccess = {
-                    _state.value = UiState.Success(it)
-                },
-                onFailure = {
-                    _state.value = UiState.Error("error")
-                }
+@Composable
+fun PopularMoviesView(
+    movies: List<MovieModel>,
+    onLikeClick: (MovieModel) -> Unit
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        items(movies.size) {
+            CardMovie(
+                movie = movies[it],
+                onLikeClick = onLikeClick
             )
+        }
+    }
+}
+
+@Composable
+fun CardMovie(
+    movie: MovieModel,
+    onLikeClick: (MovieModel) -> Unit
+) {
+    OutlinedCard(
+        modifier = Modifier
+            .padding(4.dp)
+            .fillMaxSize(),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(6.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            AsyncImage(
+                model = movie.pathUrl,
+                contentDescription = movie.title,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(0.7f)
+            )
+
+            Text(
+                text = movie.title,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth(),
+                maxLines = 2
+            )
+
+            IconButton(onClick = { onLikeClick(movie) }) {
+                Icon(
+                    painter = if (movie.isLiked)
+                        painterResource(id = R.drawable.ic_heart_filled)
+                    else
+                        painterResource(id = R.drawable.ic_heart_outline),
+                    contentDescription = if (movie.isLiked) "Unlike" else "Like"
+                )
+            }
         }
     }
 }
