@@ -16,5 +16,20 @@ data class DollarEntity(
     @ColumnInfo(name = "dollar_parallel")
     var dollarParallel: String? = null,
 
+    @ColumnInfo(name = "compra_official")
+    var compraOfficial: String? = null,
+
+    @ColumnInfo(name = "venta_official")
+    var ventaOfficial: String? = null,
+
+    @ColumnInfo(name = "compra_parallel")
+    var compraParallel: String? = null,
+
+    @ColumnInfo(name = "venta_parallel")
+    var ventaParallel: String? = null,
+
+    @ColumnInfo(name = "fecha_actualizacion")
+    var fechaActualizacion: String? = null,
+
     @ColumnInfo(name = "timestamp")
     var timestamp: Long = 0)
