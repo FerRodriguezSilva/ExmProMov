@@ -11,7 +11,7 @@ import org.mockito.Mockito.mock
 class ProfileValueObjectsTest {
 
     @Test
-    fun `crear ProfileName válido`() {
+    fun crear ProfileNamevalido() {
         // Given
         val nombreValido = "Homero Simpson"
 
